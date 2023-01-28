@@ -12,7 +12,13 @@ function Chat(props) {
                 </div>
 
                 <div className="bubbleInfo">
-                    <p>{props.data}</p>
+                    <div className="bubbleTimestamp">
+                        <p>{props.data}</p>
+                    </div>
+                    <div className="bubbleSender">
+                        <p>{props.sender}</p>
+                    </div>
+                        
                 </div>
             </div>
         </div>

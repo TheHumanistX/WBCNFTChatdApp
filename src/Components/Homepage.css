@@ -224,12 +224,21 @@ section {
 }
 
 .bubbleInfo {
-    text-align: left;
     margin-top: 0px;
     margin-left: 14px;
     margin-bottom: 15px;
 }
 
+
+.bubbleTimestamp {
+    display: inline;
+    float: left;
+}
+
+.bubbleSender {
+    display: inline;
+    float: right;
+}
 
 .chatText {
     display: flex;
@@ -251,4 +260,3 @@ section {
     margin: 5px;
 }
 
-.chatMessage {}
