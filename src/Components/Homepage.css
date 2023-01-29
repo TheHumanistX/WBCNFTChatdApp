@@ -238,6 +238,7 @@ section {
 .bubbleSender {
     display: inline;
     float: right;
+    margin-right: 15px;
 }
 
 .chatText {
@@ -259,4 +260,3 @@ section {
     margin-right: 14px;
     margin: 5px;
 }
-
