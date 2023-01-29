@@ -15,6 +15,7 @@ function Homepage(props) {
     const [pagination, setPagination] = useState(0);
     const [NFT, setNFT] = useState(0);
     const [NFTlist, setNFTlist] = useState([]);
+    const [noMoreMessages, setNoMoreMessages] = useState(false);
 
     const timeConversion = (timeStampBigNumber) => {
         const timeStampInt = timeStampBigNumber.toNumber();
@@ -33,20 +34,17 @@ function Homepage(props) {
 
     const getMessages = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts");
         const signer = provider.getSigner();
         const contract = new ethers.Contract("0x35F7f83F7d153e9c4A2E9B07e1302D46E259b5AD", MintABI, signer);
 
         const totalMessages = await contract.totalMessages();
-
+        setNoMoreMessages(Math.floor(totalMessages / ((pagination + 1) * 10)) <= 0 ? true : false)
         const displayPerPage = 10;
-        //console.log("Pagination from before getMessages(): " + pagination);
         const starting = totalMessages - (displayPerPage * pagination) - 1;
-        //console.log("Pagination from after getMessages(): " + pagination);
 
         const currentAddress = await signer.getAddress();
-        //console.log(currentAddress);
         const numberOfNFTsHeld = await contract.balanceOf(currentAddress);
-        //console.log(numberOfNFTsHeld.toNumber());
 
         for (var i = 0; i < numberOfNFTsHeld; i++) {
             const currentNFT = await contract.tokenOfOwnerByIndex(currentAddress, i);
@@ -67,50 +65,35 @@ function Homepage(props) {
 
     }
 
-    // const messagesBack = async () => {
-    //     // console.log("Pagination from before Back: " + pagination);
-    //     setPagination((old) => old + 1);
-    //     //getMessages();
-    //     //console.log("Pagination from after Back: " + pagination);
-    // }
-
-    // const messagesForward = async () => {
-    //     //console.log("Pagination from before Forward: " + pagination);
-    //     setPagination((old) => old - 1);
-    //     //getMessages();
-    //     //console.log("Pagination from after Forward: " + pagination);
-    // }
-
-    // const getNFTs = async () => {
-
-    // }
-
     useEffect(() => {
         getMessages();
     }, [pagination]);
+
+    
     return (
         <div>
 
             <section>
                 <div className="hero">
-                    <button className="header-cta"><a onClick={() => { setPagination((old) => old + 1); console.log("Pagination After Back Click: " + pagination) }} href="#" >Back</a></button>
-                    <button className="header-cta"><a onClick={() => { setPagination((old) => old - 1); console.log("Pagination After Forward Click: " + pagination) }} href="#" >Forward</a></button>
+                    <button key="Back-Button" className="header-cta"><a onClick={() => noMoreMessages ? null : setPagination((old) => old + 1) } href="#" >Back</a></button>
+                    <button key="Forward-Button" className="header-cta"><a onClick={() => pagination > 0 ? setPagination((old) => old - 1) : null} href="#" >Forward</a></button>
                     <div className="chatMessage">
-                        {allChats.map((item => {
+                        {allChats.map((item, index) => {
                             const date = item[4].toString();
 
                             return (
-                                <Chat key={item.id} text={item[3]} image="https://yt3.ggpht.com/ytc/AMLnZu-2DrkobCQd6ri63wO9SuMFGyTbyMhD5kQ6Up2N=s900-c-k-c0x00ffffff-no-rj" data={date} sender={item[1]} />
+                                <Chat key={index} text={item[3]} image="https://yt3.ggpht.com/ytc/AMLnZu-2DrkobCQd6ri63wO9SuMFGyTbyMhD5kQ6Up2N=s900-c-k-c0x00ffffff-no-rj" data={date} sender={item[1]} />
 
                             )
-                        }))}
+                        })}
 
                     </div>
 
                     <div className="Send">
                         <select onChange={(e) => setNFT(e.target.value)} name="NFTid" id="NFTid">
-                            {NFTlist.map((item) => (
-                                <option key={item.id} value={item.toString()}>{item.toString()}</option>
+                                <option key="ChooseNFT">Choose An NFT</option>
+                            {NFTlist.map((item, index) => (
+                                <option key={index} value={item.toString()}>{item.toString()}</option>
                             ))}
 
                         </select>
@@ -121,7 +104,7 @@ function Homepage(props) {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                         />
-                        <button className="header-cta"><a onClick={sendMessage} href="#" > Send</a></button>
+                        <button key="Send-Button" className="header-cta"><a onClick={sendMessage} href="#" > Send</a></button>
                     </div>
                 </div>
             </section >
